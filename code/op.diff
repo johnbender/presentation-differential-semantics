@@ -1,0 +1,3 @@
+ def op(n, m):
+-  return str(sqrt(n, m))
++  return sqrt(n, m)*2
