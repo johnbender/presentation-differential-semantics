@@ -1,0 +1,32 @@
+* Semantic Deficiency
+** intent vs code
+*** optimizations
+*** error messages
+*** bug finding
+*** declarative langs.
+** sources of semantics
+*** syntax
+*** tests
+*** types
+*** execution
+** isolated view
+*** single version
+*** programs evolve
+*** state evolves
+* Semantics for Diffs
+** high level
+*** meaning of patches
+*** correctness of patches
+*** migration of system state
+** sql ddl
+*** table declarations
+*** alter statements
+*** goal: idempotent
+*** complexity growth
+*** reduction with diffs
+** config mgmt
+*** similar to DDL
+*** less declarative
+*** package install removal
+** dynamic software update
+*** adapter synthesis

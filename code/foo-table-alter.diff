@@ -1,0 +1,6 @@
+ create table foo (
+   bar int,
+   baz varchar(10),
+-  bak varchar(10)
++  baks varchar(20)
+ );
