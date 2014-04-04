@@ -10,10 +10,10 @@
 \usepackage{listings}
 
 \lstdefinelanguage{diff}{
-  morecomment=[f][\color{blue}]{@@},     % group identifier
-  morecomment=[f][\color{red}]-,         % deleted lines
-  morecomment=[f][\color{green}]+,       % added lines
-  morecomment=[f][\color{magenta}]{---}, % Diff header lines (must appear after +,-)
+  morecomment=[f][\color{blue}]{@@},
+  morecomment=[f][\color{red}]-,
+  morecomment=[f][\color{green}]+,
+  morecomment=[f][\color{magenta}]{---},
   morecomment=[f][\color{magenta}]{+++},
 }
 
@@ -35,7 +35,6 @@
 \definecolor{solarized@green}{HTML}{859900}
 
 \lstset{
-  language=SQL,
   upquote=true,
   columns=fixed,
   tabsize=2,
@@ -52,14 +51,11 @@
   emphstyle=\color{solarized@red}
 }
 
+
+
 \newcommand{\mtt}[1]{
   \mathtt{#1}\;
 }
-
-\renewcommand{\syntleft}{\normalfont\itshape}
-\renewcommand{\syntright}{}
-
-\newcommand{\bfdefault}{bx}
 
 % There are many different themes available for Beamer. A comprehensive
 % list with examples is given here:
@@ -222,11 +218,11 @@
   \begin{example}
     \begin{center}
       \begin{minipage}{.44\textwidth}
-        \lstinputlisting[language=diff]{code/foo-table.diff}
+        \lstinputlisting[language=diff,identifierstyle=\color{black}]{code/foo-table.diff}
       \end{minipage}
       \hfill
       \begin{minipage}{.48\textwidth}
-        \lstinputlisting[language=diff]{code/foo-table-alter.diff}
+        \lstinputlisting[language=diff,identifierstyle=\color{black}]{code/foo-table-alter.diff}
       \end{minipage}
     \end{center}
   \end{example}
@@ -241,11 +237,11 @@
 
   \begin{example}
     \begin{center}
-      \begin{minipage}{.52\textwidth}
+      \begin{minipage}{.54\textwidth}
        \lstinputlisting[language=python]{code/op_string.py}
       \end{minipage}
       \hfill
-      \begin{minipage}{.47\textwidth}
+      \begin{minipage}{.45\textwidth}
         \lstinputlisting[language=python]{code/op.py}
       \end{minipage}
     \end{center}
@@ -255,11 +251,11 @@
 \begin{frame}[fragile]
   \frametitle{Dynamic Software Update}
   \begin{block}{Type mismatch}
-    The diff gives us a fighting change at using \verb|str| as the adapter for the running system.
+    The diff gives a chance at using \verb|str| as the adapter.
   \end{block}
 
   \begin{example}
-    \lstinputlisting[language=diff]{code/op.diff}
+    \lstinputlisting[language=diff,identifierstyle=\color{black}]{code/op.diff}
   \end{example}
 \end{frame}
 \end{document}

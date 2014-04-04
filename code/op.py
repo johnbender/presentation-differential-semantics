@@ -1,3 +1,4 @@
-# Int x Int -> Int
+# new version
+# (Int, Int) -> Int
 def op(n, m):
-  return sqrt(n, m)*2
+  return sqrt(n, m)
