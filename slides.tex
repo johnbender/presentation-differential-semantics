@@ -1,13 +1,22 @@
 \documentclass{beamer}
 \usefonttheme{serif}
-\usepackage{wrapfig}
+\usepackage{bbold}
+\usepackage{semantic}
 \usepackage{palatino}
-\usepackage{latexsym}
-\usepackage{verbatim}
-\usepackage{alltt}
-\usepackage{mathtools}
-\usepackage{mdframed}
 \usepackage{listings}
+\usepackage{mathtools}
+\usepackage{xstring}
+\usepackage{syntax}
+\usepackage{color}
+
+\renewcommand{\syntleft}{\normalfont\itshape}
+\renewcommand{\syntright}{}
+
+\newcommand{\hilight}[1]{\colorbox{yellow}{#1}}
+
+\newcommand{\cmp}[2]{
+  \mathcal{#1}|[ \mathtt{ \StrSubstitute{#2}{ }{\ } } |]
+}
 
 \lstdefinelanguage{diff}{
   morecomment=[f][\color{blue}]{@@},
@@ -49,12 +58,6 @@
   identifierstyle=\color{solarized@blue},
   commentstyle=\color{solarized@base01},
   emphstyle=\color{solarized@red}
-}
-
-
-
-\newcommand{\mtt}[1]{
-  \mathtt{#1}\;
 }
 
 % There are many different themes available for Beamer. A comprehensive
@@ -228,6 +231,78 @@
   \end{example}
 \end{frame}
 
+\begin{frame}[fragile]{DDL Semantics}{Traditional Grammar}
+  \begin{grammar}
+    <Program> ::= <Declaration>\lit*{;}
+
+    <Declaration> ::= <Declaration>\lit*{;} <Declaration> | <Create> | <Alter> | <Drop>
+
+    <Create> ::= \lit*{create table} <Identifier> \lit*{(} <Column> \lit*{)}
+
+    <Drop> ::= \lit*{drop table} <Identifier>
+
+    <Column> ::= <Column>, <Column> | <Identifier> <Type>
+
+    <Alter> ::= \lit*{alter table} <Identifier> \lit*{add} <Identifier> <Type>
+           \alt \lit*{alter table} <Identifier> \lit*{drop} <Identifier>
+
+    <Type> := \lit*{int} | \lit*{varchar(10)}
+  \end{grammar}
+\end{frame}
+
+\begin{frame}[fragile]{DDL Semantics}{Denotational Semantics}
+  \footnotesize
+  \begin{alignat*}{2}
+    &\mathcal{S} : Declaration -> Schema -> Schem&&a \\
+    &\cmp{S}{D;}s &&= \cmp{S}{D}s \\
+    &\cmp{S}{D1;D2}s &&= \cmp{S}{D2}\ (\cmp{S}{D1}\ s) \\
+    &\cmp{S}{create table I ( C )} s &&=
+      schemaChange\ \mathtt{I}\ (\cmp{T}{C}\ table)\ s \\
+    &\cmp{S}{drop table I}s &&= schemaChange\ \mathtt{I}\ \bot\ s \\
+    &\cmp{S}{alter table I1 add I2 Ty}s &&= schemaChange\ \mathtt{I1}\ (\cmp{T}{\mathtt{I2} Ty}\ (s\ \mathtt{I1}))\ s\\
+    &\cmp{S}{alter table I1 drop I2}s &&=
+      schemaChange\ \mathtt{I1}\ (tableChange\ \mathtt{I2}\ \bot\ (\mathtt{s}\ \mathtt{I1}))\ s \\
+    \\
+    &\mathcal{T} : Declaration -> Table -> Table && \\
+    &\cmp{T}{C1, C2}t &&= \cmp{T}{C2}\ (\cmp{T}{C1}\ t) \\
+    &\cmp{T}{I Ty}t &&= tableChange\ \mathtt{I}\ \mathtt{Ty}\ t \\
+  \end{alignat*}
+  \normalsize
+\end{frame}
+
+\begin{frame}[fragile]{DDL Semantics}{Reduced Grammar}
+  \begin{grammar}
+    <Program> := <Declaration>;
+
+    <Declaration> := <Declaration>; <Declaration> | <Create> | <Alter> | <Drop>
+
+    <Create> := \lit*{create table} <Identifier> ( <Column> )
+
+    <Column> := <Column>, <Column> | <Identifier> <Type>
+
+    <Type> := \lit*{int} | \lit*{varchar(10)}
+  \end{grammar}
+\end{frame}
+
+\begin{frame}[fragile]{DDL Semantics}{Denotational Semantics}
+  \footnotesize
+  \begin{alignat*}{2}
+  &\delta \in \{-, +, \eta \} &&\\
+  &\mathcal{S} : Differential -> Schema -> &&Schema \\
+  &\cmp{S}{D;}^{\delta}s &&= \cmp{T}{D}^{\delta}\ s \\
+  &\cmp{S}{D1;D2}^{\delta}s &&= \cmp{T}{D2}^{\delta}\ (\cmp{T}{D1}^{\delta}\ s) \\
+  &\cmp{S}{create table I ( C )}^{-}s &&= schemaChange\ \mathtt{I}\ \bot\ s\\
+  &\cmp{S}{create table I ( C )}^{+}s &&= schemaChange\ \mathtt{I}\ (\cmp{T}{C}\ table) \ s \\
+  &\cmp{S}{create table I ( C )}^{\eta}s &&= schemaChange\ \mathtt{I}\ (\cmp{T}{C}\ (s\ \mathtt{I})) \\
+\\
+  &\mathcal{T} : Differential -> Table ->&& Table\\
+  &\cmp{T}{C1, C2}^{\delta}t &&= \cmp{T}{C2}^{\delta}\ (\cmp{T}{C1}^{\delta}\ t) \\
+  &\cmp{T}{I Ty}^{-}t &&= tableChange\ \mathtt{I}\ \bot\ t\\
+  &\cmp{T}{I Ty}^{+}t &&= tableChange\ \mathtt{I}\ \mathtt{Ty}\ t\\
+  &\cmp{T}{I Ty}^{\eta}t &&= t \\
+  \end{alignat*}
+  \normalsize
+\end{frame}
 
 \begin{frame}[fragile]
   \frametitle{Dynamic Software Update}
@@ -238,11 +313,21 @@
   \begin{example}
     \begin{center}
       \begin{minipage}{.54\textwidth}
-       \lstinputlisting[language=python]{code/op_string.py}
+        \begin{lstlisting}[language=python]
+# old version
+# (Int, Int) -> String
+def op(n, m):
+ return str(sqrt(n, m))
+        \end{lstlisting}
       \end{minipage}
       \hfill
       \begin{minipage}{.45\textwidth}
-        \lstinputlisting[language=python]{code/op.py}
+        \begin{lstlisting}[language=python]
+# new version
+# (Int, Int) -> Int
+def op(n, m):
+  return sqrt(n, m)
+        \end{lstlisting}
       \end{minipage}
     \end{center}
   \end{example}
@@ -251,11 +336,12 @@
 \begin{frame}[fragile]
   \frametitle{Dynamic Software Update}
   \begin{block}{Type mismatch}
-    The diff gives a chance at using \verb|str| as the adapter.
+    The diff suggests \verb|str| as the adapter.
   \end{block}
 
   \begin{example}
     \lstinputlisting[language=diff,identifierstyle=\color{black}]{code/op.diff}
   \end{example}
 \end{frame}
+
 \end{document}
