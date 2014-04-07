@@ -1,1 +1,2 @@
+# clear/declarative
 package "memcached"

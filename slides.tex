@@ -317,20 +317,34 @@
   \normalsize
 \end{frame}
 
-\begin{frame}[fragile]{Chef DSL}
+\begin{frame}[fragile]{System Configuration}
   \begin{block}{System Configuration}
-    Configuring things like package installation start declarative.
+    The ``DevOps'' movement and server configuration as testable, repeatable code.
+  \end{block}
+
+  \begin{itemize}
+    \item Millions in start-up funding
+    \item Chef (63MM), Puppet(13.5MM), Ansible, Salt Stack
+    \item Vagrant, Packer, Docker
+    \item Predominantly declarative
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{System Configuration}
+  \begin{block}{System Configuration}
+    Configuring things like package installation starts declarative.
   \end{block}
 
   \begin{example}
     \begin{center}
       \begin{minipage}{.48\textwidth}
         \lstinputlisting[language=ruby]{code/package.rb}
-        \vspace{0.9cm}
+        \vspace{0.94cm}
       \end{minipage}
       \hfill
       \begin{minipage}{.48\textwidth}
         \begin{lstlisting}[language=ruby]
+# oops! artifacts
 package "memcached" do
   action :remove
 end
