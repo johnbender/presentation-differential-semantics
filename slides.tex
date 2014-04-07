@@ -7,12 +7,14 @@
 \usepackage{mathtools}
 \usepackage{xstring}
 \usepackage{syntax}
-\usepackage{color}
+\usepackage{xcolor}
 
 \renewcommand{\syntleft}{\normalfont\itshape}
 \renewcommand{\syntright}{}
 
-\newcommand{\hilight}[1]{\colorbox{yellow}{#1}}
+\newcommand{\highlight}[1]{\colorbox{yellow}{$\displaystyle #1$}}
+\newcommand{\hilight}[1]{%
+  \colorbox{red!50}{$\displaystyle#1$}}
 
 \newcommand{\cmp}[2]{
   \mathcal{#1}|[ \mathtt{ \StrSubstitute{#2}{ }{\ } } |]
@@ -204,7 +206,7 @@
 \begin{frame}[fragile]
   \frametitle{SQL DLL}
   \begin{block}{Declarativish}
-    It quickly degenerates and reasoning about the state of the schema goes out with the bathwater.
+    Degenerates quickly and reasoning about the schema is tough.
   \end{block}
 
   \begin{example}
@@ -258,8 +260,10 @@
     &\cmp{S}{D1;D2}s &&= \cmp{S}{D2}\ (\cmp{S}{D1}\ s) \\
     &\cmp{S}{create table I ( C )} s &&=
       schemaChange\ \mathtt{I}\ (\cmp{T}{C}\ table)\ s \\
-    &\cmp{S}{drop table I}s &&= schemaChange\ \mathtt{I}\ \bot\ s \\
-    &\cmp{S}{alter table I1 add I2 Ty}s &&= schemaChange\ \mathtt{I1}\ (\cmp{T}{\mathtt{I2} Ty}\ (s\ \mathtt{I1}))\ s\\
+    &\cmp{S}{drop table I}s &&=
+      schemaChange\ \mathtt{I}\ \bot\ s \\
+    &\cmp{S}{alter table I1 add I2 Ty}s &&=
+      schemaChange\ \mathtt{I1}\ (\cmp{T}{\mathtt{I2} Ty}\ (s\ \mathtt{I1}))\ s\\
     &\cmp{S}{alter table I1 drop I2}s &&=
       schemaChange\ \mathtt{I1}\ (tableChange\ \mathtt{I2}\ \bot\ (\mathtt{s}\ \mathtt{I1}))\ s \\
     \\
@@ -303,6 +307,31 @@
   \end{alignat*}
   \normalsize
 \end{frame}
+
+\begin{frame}[fragile]{Chef DSL}
+  \begin{block}{System Configuration}
+    Provisioning new servers. Things like package installation are declarative.
+  \end{block}
+
+  \begin{example}
+    \lstinputlisting[language=ruby]{code/package.rb}
+  \end{example}
+\end{frame}
+
+\begin{frame}[fragile]{Chef DSL}
+  \begin{block}{System Configuration}
+    Declaring removal is a bizarre state for configuration.
+  \end{block}
+
+  \begin{example}
+    \begin{lstlisting}[language=ruby]
+package "memcached" do
+  action :remove
+end
+    \end{lstlisting}
+  \end{example}
+\end{frame}
+
 
 \begin{frame}[fragile]
   \frametitle{Dynamic Software Update}
